@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\Orderitem;
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\Auth;
+
 class DeliveryController extends Controller
 {
     public function index(Request $request)
 {
     $date = $request->date ?? now()->toDateString();
-
+    $user =  Auth::user();
     $orders = Order::with([
         'customer',
         'items.fish',
@@ -21,7 +23,7 @@ class DeliveryController extends Controller
     ->orderBy('id', 'desc')
     ->get();
 
-    return view('delivery', compact('orders', 'date'));
+    return view('delivery', compact('orders', 'date','user'));
 }
 
    public function close(Request $request, $id)

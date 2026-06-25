@@ -194,17 +194,20 @@
     font-size: 18px;
 }
 </style>
+
 <div class="nk-page nk-vendor">
 <div class="header">
     <h2>Vendor Page</h2>
     <h2 class="box">{{ $vendors->name }}</h2>
 </div>
-<form method="POST" action="{{ route('vendor.logout') }}">
+<form method="POST" action="{{ route('logout') }}">
+
     @csrf
     <button class="btn btn-danger">
         <i class="fa fa-sign-out-alt"></i> Logout
     </button>
 </form>
+
 
 
 <form method="POST" action="/vendor">

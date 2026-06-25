@@ -17,12 +17,12 @@ class ReportController extends Controller
     {
           $todayPrices = DB::table('today_prices')
     ->join('fishes','fishes.id','=','today_prices.fish_id')
-    ->join('vendors','vendors.id','=','today_prices.vendor_id')
+    ->join('users','users.id','=','today_prices.vendor_id')
     ->whereDate('today_prices.date', today())
     ->select(
          'fishes.id as fish_id',
         'fishes.name as fish_name',
-        'vendors.name as vendor_name',
+        'users.name as vendor_name',
         'today_prices.vendor_price',
         'today_prices.selling_price'
     )
@@ -71,7 +71,7 @@ public function getTodayFishVendorList()
 
     $data = DB::table('vendor_fish_prices as vfp')
     ->join('fishes', 'fishes.id', '=', 'vfp.fish_id')
-    ->join('vendors', 'vendors.id', '=', 'vfp.vendor_id')
+    ->join('users', 'users.id', '=', 'vfp.vendor_id')
     ->joinSub($lowestPriceSub, 'lp', function ($join) {
         $join->on('lp.fish_id', '=', 'vfp.fish_id');
     })
@@ -79,8 +79,8 @@ public function getTodayFishVendorList()
     ->select(
         'fishes.id as fish_id',
         'fishes.name as fish_name',
-        'vendors.id as vendor_id',
-        'vendors.name as vendor_name',
+        'users.id as vendor_id',
+        'users.name as vendor_name',
         'vfp.price_per_kg',
         DB::raw('CASE WHEN vfp.price_per_kg = lp.min_price THEN 1 ELSE 0 END AS is_lowest')
     )
@@ -92,42 +92,51 @@ return response()->json($data);
 
 public function store(Request $request)
 {
-     if (!$request->customer_id) {
+    if (!$request->customer_id) {
 
+        // Create new customer
         $customer = Customer::create([
-            'name' => $request->customer_name,
-            'phone' => $request->phone,
-            'address' => $request->address,
+            'name'         => $request->customer_name,
+            'phone'        => $request->phone,
+            'address'      => $request->address,
             'geo_location' => $request->geo_location,
         ]);
 
-        $customerId = $customer->id;
-
     } else {
-        $customerId = $request->customer_id;
+
+        // Find existing customer
+        $customer = Customer::findOrFail($request->customer_id);
+
+        // Update customer details
+        $customer->update([
+            'name'         => $request->customer_name,
+            'phone'        => $request->phone,
+            'address'      => $request->address,
+            'geo_location' => $request->geo_location,
+        ]);
     }
+
     $order = Order::create([
-        'customer_id'     => $customerId,
+        'customer_id'     => $customer->id,
         'total_weight'    => collect($request->items)->sum('weight'),
         'cleaning_charge' => $request->cleaning_charge,
         'delivery_charge' => $request->delivery_charge,
         'total_amount'    => $request->total_amount,
         'payment_method'  => 'cash',
-        'remark'          => $request->remark, // ✅ added
+        'remark'          => $request->remark,
         'status'          => 'pending',
     ]);
 
     foreach ($request->items as $item) {
-
         OrderItem::create([
-            'order_id'         => $order->id,
-            'fish_id'          => $item['fish_id'],
-            'vendor_id'        => $item['vendor_id'],
-            'weight'           => $item['weight'],
-            'cost_price'       => $item['cost_price'],
-            'price'            => $item['price'],
-            'cleaning_required'=> isset($item['cleaning_required']) ? 1 : 0,
-            'cleaning_type'           => $item['clean_type'] ?? null,
+            'order_id'           => $order->id,
+            'fish_id'            => $item['fish_id'],
+            'vendor_id'          => $item['vendor_id'],
+            'weight'             => $item['weight'],
+            'cost_price'         => $item['cost_price'],
+            'price'              => $item['price'],
+            'cleaning_required'  => isset($item['cleaning_required']) ? 1 : 0,
+            'cleaning_type'      => $item['clean_type'] ?? null,
         ]);
     }
 

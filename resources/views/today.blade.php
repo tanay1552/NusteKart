@@ -357,6 +357,9 @@ td{
     .free{
         font-size:20px;
     }
+    .fish-box td{
+    font-size:36px;
+}
 }
 
 /* ================= MOBILE ================= */
@@ -364,53 +367,64 @@ td{
 @media (max-width:768px){
 
     .poster{
-        width:100%;
+        width:250%;
         transform:scale(.4);
         transform-origin:top left;
-        width:250%;
+        display:flex;
+        align-items:stretch;
     }
 
-    .date{
-        font-size:22px;
-    }
+ .left{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+}
 
-    .heading{
-        font-size:32px;
-    }
+   .fish-box{
+    margin-top:25px;
+    background:white;
+    width:100%;
+    padding:0;
+}
 
-    .fish-box th{
-        font-size:18px;
-        padding:10px;
-    }
+.fish-box table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:auto;
+    
+}
+.fish-box td{
+    font-size:6.77vw;
+}
+.right{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+}
 
-    .fish-box td{
-        font-size:22px;
-        padding:10px;
-    }
+}
+</style>
 
-    .order-title{
-        font-size:35px;
-    }
+   .fish-box{
+    margin-top:25px;
+    background:white;
+    width:100%;
+    padding:0;
+}
+.fish-box td{
+    font-size:36px;
+}
+.fish-box table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:auto;
+}
+  .right{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+}
 
-    .order-sub{
-        font-size:20px;
-    }
-
-    .phone{
-        font-size:38px;
-    }
-
-    .note{
-        font-size:18px;
-    }
-
-    .free{
-        font-size:16px;
-    }
-    .fish-box tbody
-    {
-        width:100%
-    }
 }
 </style>
   
@@ -529,13 +543,13 @@ td{
     @csrf
 
     {{-- Customer --}}
-    <label>Customer Phone</label>
+    <label>Customer Phone <span style="color:red;">*</span></label>
     <input type="text" id="phone" name="phone">
 
-    <label>Customer Name</label>
+    <label>Customer Name <span style="color:red;">*</span></label>
     <input type="text" id="customer_name" name="customer_name">
 
-    <label>Address</label>
+    <label>Address <span style="color:red;">*</span></label>
     <input type="text" id="customer_address" name="address">
 
     <label>Geo Location</label>
@@ -554,27 +568,27 @@ td{
         <div class="item-grid">
 
             <div class="field">
-                <label>Fish</label>
+                <label>Fish <span style="color:red;">*</span></label>
                 <select name="items[0][fish_id]" class="fishSelect" required></select>
             </div>
 
             <div class="field">
-                <label>Vendor</label>
+                <label>Vendor <span style="color:red;">*</span></label>
                 <select name="items[0][vendor_id]" class="vendorSelect" required></select>
             </div>
 
             <div class="field">
-                <label>Vendor Price</label>
+                <label>Vendor Price <span style="color:red;">*</span></label>
                 <input type="number" name="items[0][cost_price]" class="vendor_price" readonly>
             </div>
 
             <div class="field">
-                <label>Selling Price</label>
+                <label>Selling Price <span style="color:red;">*</span></label>
                 <input type="number" name="items[0][price]" class="selling_price" readonly>
             </div>
 
             <div class="field">
-                <label>Weight (KG)</label>
+                <label>Weight (KG) <span style="color:red;">*</span></label>
                 <input type="number" step="0.01" name="items[0][weight]" class="weight" required>
             </div>
 
@@ -605,17 +619,17 @@ td{
 
     <hr>
 
-    <label>Cleaning Charges</label>
-    <input type="number" id="cleaning_charge" name="cleaning_charge" value="0">
+    <label>Cleaning Charges <span style="color:red;">*</span></label>
+    <input type="number" id="cleaning_charge" name="cleaning_charge" value="0" required >
 
-    <label>Delivery Charges</label>
-    <input type="number" id="delivery_charge" name="delivery_charge" value="0">
+    <label>Delivery Charges <span style="color:red;">*</span></label>
+    <input type="number" id="delivery_charge" name="delivery_charge" value="0" required>
 
-    <label>Total Amount</label>
-    <input type="number" id="total_amount" name="total_amount" >
+    <label>Total Amount <span style="color:red;">*</span> </label>
+    <input type="number" id="total_amount" name="total_amount" required >
 
-    <label>Order Remark</label>
-    <input type="text" name="remark" placeholder="Eg: Give Early / Give Late Delivery">
+    <label>Order Remark <span style="color:red;">*</span></label>
+    <input type="text" name="remark" placeholder="Eg: Give Early / Give Late Delivery" required>
 
     <button type="submit">Save Order</button>
 </form>
@@ -741,9 +755,9 @@ document.getElementById('phone').addEventListener('keyup', function () {
                 geoInput.value = data.data.geo_location || '';
                 customerIdInput.value = data.data.id;
 
-                nameInput.readOnly = true;
-                addressInput.readOnly = true;
-                geoInput.readOnly = true;
+                nameInput.readOnly = false;
+                addressInput.readOnly = false;
+                geoInput.readOnly = false;
 
             } else {
 

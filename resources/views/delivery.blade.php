@@ -86,15 +86,20 @@
 }
 
 .nk-delivery button {
-    flex: 1;
-    min-width: 90px;
+    margin-top: 14px;
+    background: #0ea5a4;
+    color: white;
     border: none;
-    padding: 10px;
+    padding: 10px 16px;
     border-radius: 10px;
-    font-weight: 600;
     cursor: pointer;
+    font-weight: 600;
     font-size: 14px;
     transition: 0.25s;
+}
+
+.nk-delivery button:hover {
+    background: #0b8f8e;
 }
 
 /* button colors */
@@ -174,10 +179,35 @@
         margin: auto;
     }
 }
+.header{
+    display: flex;
+    justify-content: space-between; /* puts one left and one right */
+    align-items: center;
+}
+
+.box{
+    margin: 0;
+    background: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 18px;
+}
 </style>
 <div class="nk-page nk-delivery">
-    
-<h2>Delivery – Vishnu</h2>
+    <div class="header">
+        <h2>Delivery Page</h2>
+        <h2 class="box">{{  $user->name }}</h2>
+    </div>
+
+<form method="POST" action="{{ route('logout') }}">
+
+    @csrf
+    <button class="btn btn-danger">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </button>
+</form>
+
+
 
 @foreach($orders as $o)
 

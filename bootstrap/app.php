@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
         $middleware->alias([
         'vendor.auth' => \App\Http\Middleware\VendorAuthenticate::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -15,41 +15,41 @@ use Carbon\Carbon;
 
 class VendorController extends Controller
 {
-   public function index()
+public function index()
 {
-    $vendorAuth = Auth::guard('vendor')->user();
-
+    $authUser = Auth::user();
     $today = Carbon::today()->toDateString();
 
-    $vendors = $vendorAuth;
-    $fishes  = DB::table('fishes')->get();
-    $vendorAuth = Auth::guard('vendor')->user();
-    // ✅ TODAY'S DATA
-    $todayFish = DB::table('vendor_fish_prices as vfp')
-        ->join('vendors', 'vendors.id', '=', 'vfp.vendor_id')
+    $vendors =  Auth::user();
+    $fishes = DB::table('fishes')->get();
+
+    $todayFishQuery = DB::table('vendor_fish_prices as vfp')
+        ->join('users', 'users.id', '=', 'vfp.vendor_id')
         ->join('fishes', 'fishes.id', '=', 'vfp.fish_id')
         ->whereDate('vfp.date', $today)
-        ->where('vendors.id', $vendorAuth->id)
         ->select(
             'fishes.name as fish_name',
-            'vendors.name as vendor_name',
+            'users.name as vendor_name',
             'vfp.price_per_kg'
         )
         ->orderBy('fishes.name')
-        ->orderBy('vfp.price_per_kg')
-        ->get();
+        ->orderBy('vfp.price_per_kg');
 
-  
+    if ($authUser->role == 'vendor') {
+        $todayFishQuery->where('users.id', $authUser->id);
+    }
 
-   $vendorData = DB::table('order_items')
+    $todayFish = $todayFishQuery->get();
+
+
+    $vendorDataQuery = DB::table('order_items')
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
-        ->join('vendors', 'order_items.vendor_id', '=', 'vendors.id')
+        ->join('users', 'order_items.vendor_id', '=', 'users.id')
         ->join('fishes', 'order_items.fish_id', '=', 'fishes.id')
         ->join('customers', 'orders.customer_id', '=', 'customers.id')
         ->whereDate('orders.created_at', $today)
-        ->where('order_items.vendor_id', $vendorAuth->id)
         ->select(
-            'vendors.name as vendor_name',
+            'users.name as vendor_name',
             'orders.id as order_id',
             'customers.name as customer_name',
             'fishes.name as fish_name',
@@ -58,14 +58,24 @@ class VendorController extends Controller
             'order_items.cleaning_type',
             'orders.remark'
         )
-        ->orderBy('vendors.name')
-        ->orderBy('orders.id')
-        ->get();
+        ->orderBy('users.name')
+        ->orderBy('orders.id');
 
-    return view('vendor', compact('vendors', 'fishes', 'todayFish','vendorData'));
+    if ($authUser->role == 'vendor') {
+        $vendorDataQuery->where('order_items.vendor_id', $authUser->id);
+    }
+
+    $vendorData = $vendorDataQuery->get();
+
+    return view('vendor', compact(
+        'vendors',
+        'fishes',
+        'todayFish',
+        'vendorData'
+    ));
 }
     public function store(Request $r){
-        $vendorAuth = Auth::guard('vendor')->user();
+        $vendorAuth= Auth::user();
         VendorFishPrice::create([
         'vendor_id' => $vendorAuth->id,
         'fish_id' => $r->fish_id,
@@ -88,7 +98,7 @@ public function todayChart()
 
         // get lowest vendor price per fish
         $rows = DB::table('vendor_fish_prices as vfp')
-            ->join('vendors', 'vendors.id', '=', 'vfp.vendor_id')
+            ->join('users', 'users.id', '=', 'vfp.vendor_id')
             ->join('fishes', 'fishes.id', '=', 'vfp.fish_id')
             ->whereDate('vfp.date', $today)
             ->orderBy('vfp.price_per_kg', 'asc')

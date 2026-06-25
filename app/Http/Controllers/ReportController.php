@@ -15,6 +15,9 @@ class ReportController extends Controller
 {
     public function today()
     {
+          $fishes = Fish::orderBy('name')->get();
+
+        
           $todayPrices = DB::table('today_prices')
     ->join('fishes','fishes.id','=','today_prices.fish_id')
     ->join('users','users.id','=','today_prices.vendor_id')
@@ -30,7 +33,7 @@ class ReportController extends Controller
     ->get();
    
         $orders = Order::whereDate('created_at', today())->get();
-        return view('today', compact('orders','todayPrices'));
+        return view('today', compact('orders','todayPrices','fishes'));
     }
 
 
@@ -68,7 +71,7 @@ public function getTodayFishVendorList()
     ->select('fish_id', DB::raw('MIN(price_per_kg) as min_price'))
     ->whereDate('date', $today)
     ->groupBy('fish_id');
-
+ 
     $data = DB::table('vendor_fish_prices as vfp')
     ->join('fishes', 'fishes.id', '=', 'vfp.fish_id')
     ->join('users', 'users.id', '=', 'vfp.vendor_id')
@@ -142,6 +145,17 @@ public function store(Request $request)
 
     return back()->with('success', 'Order Saved Successfully');
 }
+ public function storefish(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:fishes,name'
+        ]);
 
+        Fish::create([
+            'name' => $request->name
+        ]);
+
+        return back()->with('success', 'Fish Added Successfully');
+    }
 }
 

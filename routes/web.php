@@ -20,7 +20,7 @@ Route::middleware(['auth','role:admin'])->group(function () {
 
 
     Route::get('/today-fish-vendors', [ReportController::class, 'getTodayFishVendorList']);
-
+    Route::post('/fishes/store', [ReportController::class, 'storefish'])->name('fishes.store');
     Route::post('/vendor/today-chart', [VendorController::class, 'todayChart'])
         ->name('vendor.today.chart');
     Route::post('/orders/store', [ReportController::class, 'store'])->name('orders.store');

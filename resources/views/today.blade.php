@@ -403,30 +403,17 @@ td{
 }
 
 }
-</style>
-
-   .fish-box{
-    margin-top:25px;
-    background:white;
-    width:100%;
-    padding:0;
-}
-.fish-box td{
-    font-size:36px;
-}
-.fish-box table{
-    width:100%;
-    border-collapse:collapse;
-    table-layout:auto;
-}
-  .right{
-    display:flex;
-    flex-direction:column;
-    justify-content:space-evenly;
-}
-
+input,select {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid #dcdfe6;
+    font-size: 14px;
 }
 </style>
+
+  
+
   
 <div class="nk-page">
  <div class="poster">
@@ -503,7 +490,62 @@ td{
     </div>
 
 </div>
-    <!-- ALL your existing page content here -->
+   <div class="container mt-4">
+
+    <h2>Add Fish</h2>
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form action="{{ route('fishes.store') }}" method="POST">
+        @csrf
+
+        <div class="row">
+            <div class="col-md-6">
+                <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    placeholder="Fish Name"
+                    required>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary">
+                    Save Fish
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <hr>
+<!-- 
+    <form method="POST" action="/vendor">
+@csrf
+
+<label>Date</label>
+<input type="date" name="date" value="{{ date('Y-m-d') }}" required>
+
+
+
+<label>Fish</label>
+<select name="fish_id" required>
+    <option value="">-- Select Fish --</option>
+    @foreach($fishes as $fish)
+        <option value="{{ $fish->id }}">{{ $fish->name }}</option>
+    @endforeach
+</select>
+
+<label>Price per KG</label>
+<input type="number" name="price_per_kg" required>
+
+<button type="submit">Add Fish</button>
+</form> -->
+
+</div>
 
 <form method="POST" action="{{ route('vendor.today.chart') }}">
     @csrf
@@ -522,6 +564,7 @@ td{
     <tr>
         <th>#</th>
         <th>Fish</th>
+        <th>Selling Price</th>
         <th>Vendor</th>
         <th>Vendor Price</th>
         <th>Selling Price</th>
@@ -531,9 +574,9 @@ td{
     <tr>
         <td>{{ $i+1 }}</td>
         <td>{{ $row->fish_name }}</td>
+        <td><strong>₹ {{ $row->selling_price }}</strong></td>
         <td>{{ $row->vendor_name }}</td>
         <td>₹ {{ $row->vendor_price }}</td>
-        <td><strong>₹ {{ $row->selling_price }}</strong></td>
     </tr>
     @endforeach
 </table>
